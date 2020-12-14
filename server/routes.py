@@ -50,14 +50,17 @@ def add_note(note: NoteSchema = Body(...)) -> dict:
 @router.put("/{id}")
 def update_note(id: str, note: NoteSchema):
     stored_note = notes[id]
-    stored_note_model = NoteSchema(**stored_note)
-    update_data = note.dict(exclude_unset=True)
-    updated_note = stored_note_model.copy(update=update_data)
-    notes[id] = jsonable_encoder(updated_note)
+    if stored_note:
+        stored_note_model = NoteSchema(**stored_note)
+        update_data = note.dict(exclude_unset=True)
+        updated_note = stored_note_model.copy(update=update_data)
+        notes[id] = jsonable_encoder(updated_note)
+        return {
+            "message": "Note updated successfully"
+        }
     return {
-        "message": "Note updated successfully"
+        "error": "No such note exist"
     }
-
 
 @router.delete("/{id}")
 def delete_note(id: str) -> dict:
